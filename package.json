@@ -1,0 +1,32 @@
+{
+  "name": "spatial-analysis-js-test",
+  "version": "0.0.1",
+  "description": "一个前端gis空间分析的一些方法",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "mocha test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hanks-tan/spatial-analysis-js-test.git"
+  },
+  "keywords": [
+    "spatial",
+    "analysis",
+    "geom"
+  ],
+  "author": "tangxb",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/hanks-tan/spatial-analysis-js-test/issues"
+  },
+  "homepage": "https://github.com/hanks-tan/spatial-analysis-js-test#readme",
+  "dependencies": {
+    "@turf/turf": "^6.3.0",
+    "jsts": "^2.6.1",
+    "mocha": "^8.4.0"
+  }
+}
