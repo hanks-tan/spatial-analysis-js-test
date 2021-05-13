@@ -1,4 +1,4 @@
-// 参考：https://blog.csdn.net/summer_dew/article/details/82284311
+// 算法参考：https://blog.csdn.net/summer_dew/article/details/82284311
 // 判断线段是否相交算法
 
 class Point{
@@ -21,7 +21,7 @@ class Line{
    */
   constructor(p1, p2) {
     this.a = p1
-    this.b = p1
+    this.b = p2
   }
 }
 
@@ -29,7 +29,7 @@ class Line{
  * 判断线和点的位置关系
  * @param {Point} point 
  * @param {Line} line 
- * @returns {Number} > 0 即point在line的顺时针方向下方；< 0 则point在line的逆时针方向上方；= 0则在线上
+ * @returns {Number} > 0 即point在line的顺时针方向下方；< 0 则point在line的逆时针方向上方；= 0则同线(在线上或线的延长线上)
  */
 function pointLineLocation (point, line) {
   let ab_x = line.a.x - line.b.x
@@ -38,6 +38,25 @@ function pointLineLocation (point, line) {
   let ac_y = line.a.x - point.y
   return ab_x * ac_y - ab_y * ac_x
 }
+
+/**
+ * 点在线上(包括端点上)
+ * @param {Point} point 
+ * @param {Line} line 
+ * @returns {Boolean} 真，在线上；否则反之
+ */
+function pointInLine(point, line) {
+  if (pointLineLocation(point, line) != 0) {
+    return false
+  }
+  // 排除在延长线上的情况
+  let x1 = line.a.x, x2 = line.b.x, y1 = line.a.y, y2 = line.b.y
+  if(point.x >= Math.min(x1, x2) && point.x <= Math.max(x1, x2) &&
+    point.y >= Math.min(y1, y2) && point.y <= Math.max(y1, y2)) {
+    return true
+  }
+  return false
+} 
 
 // ---------------------------------------算法1 快速排斥 + 跨立实现-------------------
 
@@ -48,20 +67,20 @@ function pointLineLocation (point, line) {
  * @returns {0 | 1} 返回值 0 不相交；1 相交
  */
 function intersection (line1, line2) {
-  if (Math.max(line1.a.x, line1.b.x) < Math.min(line2.a.x, line2.b.x)) return 0;
-  if (Math.max(line1.a.y, line1.b.y) < Math.min(line2.a.y, line2.b.y)) return 0;
-  if (Math.max(line2.a.x, line1.b.x) < Math.min(line1.a.x, line1.b.x)) return 0;
-  if (Math.max(line2.a.y, line1.b.y) < Math.min(line1.a.y, line1.b.y)) return 0;
+  if (Math.max(line1.a.x, line1.b.x) < Math.min(line2.a.x, line2.b.x)) return false;
+  if (Math.max(line1.a.y, line1.b.y) < Math.min(line2.a.y, line2.b.y)) return false;
+  if (Math.max(line2.a.x, line1.b.x) < Math.min(line1.a.x, line1.b.x)) return false;
+  if (Math.max(line2.a.y, line1.b.y) < Math.min(line1.a.y, line1.b.y)) return false;
 
-  // line1的两个端点都再line1同侧
+  // line1的两个端点都再line2同侧
   if (pointLineLocation(line1.a, line2) * pointLineLocation(line1.b, line2) > 0) {
-    return 0
+    return false
   }
   // line2的两个端点都在line1同侧
   if (pointLineLocation(line2.a, line1) * pointLineLocation(line2.b, line1) > 0) {
-    return 0
+    return false
   }
-  return 1
+  return true
 
 }
 
@@ -70,7 +89,7 @@ function intersection (line1, line2) {
  * 判断两个线段是否相交
  * @param {Line} line1 
  * @param {Line} line2 
- * @returns true 相交；false 不相交
+ * @returns {Boolean} true 相交；false 不相交
  */
 function intersect(line1, line2) {
   let deno = (line1.b.x - line1.a.x) * (line2.b.y - line2.a.y) - (line1.b.y - line1.a.y) * (line2.b.x - line2.a.x)
@@ -90,9 +109,9 @@ class Vector{
    * @param {Number} x 
    * @param {Number} y 
    */
-  constructor(x, y) {
-    this.x = x
-    this.y = y
+  constructor(options) {
+    this.x = options.x
+    this.y = options.y
   }
 }
 
@@ -118,7 +137,7 @@ function VectorConstruct(point1, point2) {
  * @returns 
  */
 function CrossProduct (vector1, vector2) {
-  return vector1.x * vector2.y - vector2.x * vector1.y
+  return vector1.x * vector2.y - vector1.y * vector2.x
 }
 
 /**
@@ -126,9 +145,9 @@ function CrossProduct (vector1, vector2) {
  * 判断四边形ACBD是否是一个凸四边形
  * @param {Line} line1 
  * @param {Line} line2 
- * @returns 
+ * @returns {Boolean} 真则相交；
  */
-function SegmentIntersection (line1, line2) {
+function segmentIntersection (line1, line2) {
   let ac = VectorConstruct(line1.a, line2.a)
   let cb = VectorConstruct(line2.a, line1.b)
   let bd = VectorConstruct(line1.b, line2.b)
@@ -148,9 +167,9 @@ function SegmentIntersection (line1, line2) {
   }
 
   if (f1 >0 && f2 > 0) { // 有正有负，则无交集
-    return 0
+    return false
   } else {
-    return 1
+    return true
   }
 }
 
@@ -159,7 +178,8 @@ module.exports = {
   Line,
   Vector,
   pointLineLocation,
+  pointInLine,
   intersect,
   intersection,
-  SegmentIntersection
+  segmentIntersection
 }
